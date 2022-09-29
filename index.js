@@ -1,49 +1,48 @@
-const https = require('https');
+// Load the AWS SDK for Node.js
+var AWS = require('aws-sdk');
+// Set the region
+AWS.config.update({region: 'us-east-1'});
 
-const doPostRequest = (event) => {
-  const data = {
-    value1: 1,
-    value2: 2,
-  };
-    const params = {
-//        Bucket: event.Records[0].s3.bucket.name,
-        Bucket: "secondbucket.net22.live",
-        Key: "334734167946_waflogs_cloudfront_AWSWAFSecurityAutomations_20220925T1555Z_93ee324e.log.log"
-    };
-    console.log(params.Bucket);
+// Create an SQS service object
+var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 
-  return new Promise((resolve, reject) => {
-    const options = {
-      host: 'elk5.es.us-east-1.aws.found.io',
-      path: '/waf/_doc',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'ApiKey ODN6SVk0TUJKaGdlMzdEMkJYc1Y6VU1kZ0I4T29TeGF1eDJSakk2QlN3Zw=='
-      }
-    };
-    
-    //create the request object with the callback with the result
-    const req = https.request(options, (res) => {
-      resolve(JSON.stringify(res.statusCode));
-    });
+var queueURL = "https://sqs.us-east-1.amazonaws.com/334734167946/sqs-waf-2";
 
-    // handle the possible errors
-    req.on('error', (e) => {
-      reject(e.message);
-    });
-    
-    //do the request
-    req.write(JSON.stringify(data));
-
-    //finish the request
-    req.end();
-  });
+var params = {
+ AttributeNames: [
+    "SentTimestamp"
+ ],
+ MaxNumberOfMessages: 10,
+ MessageAttributeNames: [
+    "All"
+ ],
+ QueueUrl: queueURL,
+ VisibilityTimeout: 20,
+ WaitTimeSeconds: 0
 };
 
 
 exports.handler = async (event) => {
-  await doPostRequest()
-    .then(result => console.log(`Status code: ${result}`))
-    .catch(err => console.error(`Error doing the request for the event: ${JSON.stringify(event)} => ${err}`));
+    // TODO implement
+        // const response = {
+    //     statusCode: 200,
+    //     body: JSON.stringify('Hello from Lambda!'),
+    // };
+    sqs.receiveMessage(params, function(err, data) {
+        if (err) {
+          console.log("Receive Error", err);
+        } else if (data.Messages) {
+          var deleteParams = {
+            QueueUrl: queueURL,
+            ReceiptHandle: data.Messages[0].ReceiptHandle
+          };
+          sqs.deleteMessage(deleteParams, function(err, data) {
+            if (err) {
+              console.log("Delete Error", err);
+            } else {
+              console.log("Message read and Deleted", data);
+            }
+          });
+        }
+      });      
 };

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/jazst21/sqs-to-http#readme",
   "dependencies": {
+    "aws-sdk": "^2.1225.0",
     "https": "^1.0.0"
   }
 }
