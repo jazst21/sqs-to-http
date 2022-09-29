@@ -1,0 +1,19 @@
+{
+  "name": "sqs-to-http",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jazst21/sqs-to-http.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jazst21/sqs-to-http/issues"
+  },
+  "homepage": "https://github.com/jazst21/sqs-to-http#readme"
+}
